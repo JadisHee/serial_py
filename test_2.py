@@ -1,11 +1,10 @@
+
 import serial
 import time
 import sys
 import select
 
-
-def setCom(port,buadrate):
-# 串口配置
+def setCom(port, buadrate):
     try:
         ser = serial.Serial(port, buadrate, timeout=1)
         print('串口连接成功')
@@ -13,13 +12,10 @@ def setCom(port,buadrate):
     except:
         print('串口连接失败')
         exit()
-    
 
-# 发送数据
-def send_data(data):
 
-    com = '/dev/ttyUSB4'
-    ser = setCom(com,115200)
+def send_data(data,ser):
+
     ser.write(data)
     print("发送数据: ", data.hex())
 
@@ -29,21 +25,26 @@ def send_data(data):
             print("接收数据: ", response)
             break
         time.sleep(0.1)
+    return response
 
-
-
-# 主函数
 if __name__ == '__main__':
+    # 定义发送的报文
+    send_imu = "77 04 00 59 5D"
+    send_motor = "01 03 00 57 00 0C F4 1F"
+    # 设置串口数据
+    ser_imu = setCom('/dev/ttyUSB0',115200)
+    ser_motor = setCom('/dev/ttyUSB1',9600)
 
-    data = "77 04 00 59 5D"
-    # 发送数据并等待接收回复
     while True:
-        send_data(data)
-        time.sleep(1)
+        # 执行通讯
+        response_imu = send_data(send_imu,ser_imu)
+        response_motor = send_data(send_motor, ser_motor)
+        time.sleep(0.01)
         # 检测输入，当输入小写'q'时，退出程序
         if sys.stdin in select.select([sys.stdin], [], [], 0)[0]:
             line = input()
             if line == 'q':
                 break
-    
-    ser.close()
+    # 关闭串口
+    ser_imu.close()
+    ser_motor.close()
