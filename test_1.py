@@ -4,22 +4,19 @@ import sys
 import select
 
 
-def setCom(port,buadrate):
+
 # 串口配置
-    try:
-        ser = serial.Serial(port, buadrate, timeout=1)
-        print('串口连接成功')
-        return ser
-    except:
-        print('串口连接失败')
-        exit()
+try:
+    ser = serial.Serial('/dev/ttyUSB4', 115200, timeout=1)
+    print('串口连接成功')
+except:
+    print('串口连接失败')
+    exit()
     
 
 # 发送数据
 def send_data(data):
 
-    com = '/dev/ttyUSB4'
-    ser = setCom(com,115200)
     ser.write(data)
     print("发送数据: ", data.hex())
 
